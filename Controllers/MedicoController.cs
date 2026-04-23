@@ -1,4 +1,5 @@
-﻿using ClinicaDocMais.Models;
+﻿using ClinicaDocMais.Data;
+using ClinicaDocMais.Models;
 using ClinicaDocMais.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +10,36 @@ namespace ClinicaDocMais.Controllers
     [ApiController]
     public class MedicoController : ControllerBase
     {
+        private readonly ClinicaContext _context;
+        public MedicoController(ClinicaContext context)
+        {
+            _context = context;
+        }
+
         public static List<MedicoModel> listaMedicos = new List<MedicoModel>();
 
         [HttpPost("cadastroMedico")]
-        public string cadastrarMedico([FromBody] MedicoModel medico)
+        public async Task<IActionResult> cadastrarMedico([FromBody] MedicoModel medico)
         {
-            listaMedicos.Add(medico);
-            return $"Dr. {medico.nome} cadastrado com sucesso";
+            try
+            {
+                if (medico != null)
+                {
+                    
+                    _context.Add(medico);
+                    await _context.SaveChangesAsync();
+
+                    return Ok($"Dr. {medico.nome} cadastrado com sucesso");
+                }
+                else
+                {
+                    throw new Exception("Dados do médico não podem ser nulos");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Erro ao cadastrar médico: {ex.Message}");
+            }
         }
 
         //listar os médicos
