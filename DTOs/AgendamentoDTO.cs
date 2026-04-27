@@ -5,8 +5,8 @@ namespace ClinicaDocMais.DTOs
 {
     public class AgendamentoDTO
     {
-        public PacienteModel? paciente { get; set; }
-        public MedicoModel? medico { get; set; }
+        public string? cpfpaciente { get; set; }
+        public string? crmmedico { get; set; }
         public DateTime dataHoraAgendada { get; set; }
     }
 }

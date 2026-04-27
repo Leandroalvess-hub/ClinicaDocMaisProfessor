@@ -25,7 +25,7 @@ namespace ClinicaDocMais.Controllers
             {
                 if (medico != null)
                 {
-                    
+
                     _context.Add(medico);
                     await _context.SaveChangesAsync();
 
@@ -51,10 +51,10 @@ namespace ClinicaDocMais.Controllers
 
         //editar médico
         [HttpPut("editarMedico/{crm}")]
-        public string editarMedico([FromBody] MedicoModel medicoEditado, string crm) 
+        public string editarMedico([FromBody] MedicoModel medicoEditado, string crm)
         {
             MedicoService medico = new MedicoService();
-            medico.editarMedico(medicoEditado, crm);  
+            medico.editarMedico(medicoEditado, crm);
 
             if (medico == null)
             {
@@ -64,11 +64,24 @@ namespace ClinicaDocMais.Controllers
             {
                 return $"Médico de CRM Nº {crm} editado com sucesso";
             }
-            //ou ele recebe um null caso dê errado
         }
 
-        //buscar médico
+            //excluir médico
 
-        //excluir médico
+            [HttpDelete("excluirMedico/{crm}")]
+            public string excluirMedico(string crm)
+            {
+                var medico = listaMedicos.FirstOrDefault(m => m.crm == crm);
+
+                if (medico == null)
+                {
+                    return "Médico não encontrado";
+                }
+
+                listaMedicos.Remove(medico);
+                return $"Médico de CRM Nº {crm} excluído com sucesso";
+            }
+
+        }
     }
-}
+

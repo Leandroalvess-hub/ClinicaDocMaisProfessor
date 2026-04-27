@@ -1,7 +1,9 @@
-﻿using ClinicaDocMais.DTOs;
+﻿using ClinicaDocMais.Data;
+using ClinicaDocMais.DTOs;
 using ClinicaDocMais.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClinicaDocMais.Controllers
 {
@@ -9,7 +11,12 @@ namespace ClinicaDocMais.Controllers
     [ApiController]
     public class AgendamentoController : ControllerBase
     {
-        public static List<AgendamentoModel> listaDeAgendamentos = new List<AgendamentoModel>();
+        private ClinicaContext _context;
+
+        public AgendamentoController (ClinicaContext context)
+        {
+            _context = context;
+        }
 
         [HttpPost("agendarconsulta")]
         public async Task<IActionResult> AgendarConsulta([FromBody] AgendamentoDTO dadosAgendamento)
@@ -18,15 +25,16 @@ namespace ClinicaDocMais.Controllers
             try
             {
                 AgendamentoModel agendamento = new AgendamentoModel();
-                agendamento.nomePaciente = dadosAgendamento.paciente?.nome;
-                agendamento.telefonePaciente = dadosAgendamento.paciente?.telefone;
-                agendamento.cpfPaciente = dadosAgendamento.paciente?.cpf;
-                agendamento.nomeMedico = dadosAgendamento.medico?.nome;
-                agendamento.crmMedico = dadosAgendamento.medico?.crm;
-                agendamento.especialidadeMedico = dadosAgendamento.medico?.especialidade;
+                
                 agendamento.dataHoraAgendamento = dadosAgendamento.dataHoraAgendada;
+                agendamento.crmMedico = dadosAgendamento.crmmedico;
+                agendamento.cpfPaciente = dadosAgendamento.cpfpaciente;
 
-                listaDeAgendamentos.Add(agendamento);
+                
+                await _context.Agendamentos.AddAsync(agendamento);
+
+                await _context.SaveChangesAsync();
+
                 return Created();
 
             }
@@ -34,6 +42,20 @@ namespace ClinicaDocMais.Controllers
             {
                 return BadRequest("Erro Inesperado: " + ex.Message);
             }  
+        }
+
+        [HttpGet("buscarAgendamentos")]
+        public async Task<IActionResult> BuscarAgendamentos()
+        {
+            try
+            {
+                 var listaAgendamento = await _context.Agendamentos.Include(p => p.cpfPaciente).Include(m => m.medico).ToListAsync();
+                return Ok(listaAgendamento);
+            }
+            catch (Exception ex)
+            { 
+            return BadRequest("Erro. " + ex.Message);
+            }
         }
     }
 }

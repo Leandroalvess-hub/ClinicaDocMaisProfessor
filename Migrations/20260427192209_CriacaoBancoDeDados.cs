@@ -6,41 +6,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ClinicaDocMais.Migrations
 {
     /// <inheritdoc />
-    public partial class CriacaoInicial : Migration
+    public partial class CriacaoBancoDeDados : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-          
             migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Agendamentos",
-                columns: table => new
-                {
-                    id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    nomePaciente = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    telefonePaciente = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    cpfPaciente = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    nomeMedico = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    crmMedico = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    especialidadeMedico = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    dataHoraAgendamento = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    pacientePresente = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    medicoPresente = table.Column<bool>(type: "tinyint(1)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Agendamentos", x => x.id);
-                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -101,6 +72,50 @@ namespace ClinicaDocMais.Migrations
                     table.PrimaryKey("PK_Pacientes", x => x.cpf);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Agendamentos",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    cpfPaciente = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    pacientecpf = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    crmMedico = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    medicocrm = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    dataHoraAgendamento = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    pacientePresente = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    medicoPresente = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Agendamentos", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Agendamentos_Medicos_medicocrm",
+                        column: x => x.medicocrm,
+                        principalTable: "Medicos",
+                        principalColumn: "crm");
+                    table.ForeignKey(
+                        name: "FK_Agendamentos_Pacientes_pacientecpf",
+                        column: x => x.pacientecpf,
+                        principalTable: "Pacientes",
+                        principalColumn: "cpf");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Agendamentos_medicocrm",
+                table: "Agendamentos",
+                column: "medicocrm");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Agendamentos_pacientecpf",
+                table: "Agendamentos",
+                column: "pacientecpf");
         }
 
         /// <inheritdoc />
